@@ -1,4 +1,4 @@
-from collections.__init__ import UserList
+from collections import UserList
 from typing import TypeVar, Iterable as Iterable
 
 T = TypeVar('T')
