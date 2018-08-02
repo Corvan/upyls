@@ -16,6 +16,8 @@ class LimitedList(UserList):
         :param initlist: initializing list of items
         :param limit: limit to set for the count of items, to be set on construction, read-only property later. If the
                       limit is None or 0 the list is unlimited
+        :raises: ValueError if a negative limit is tried to be passed
+        :raises: OverflowError if count of initlist items is greater than limit
         """
         if limit < 0:
             raise ValueError("Limit cannot be negative")
