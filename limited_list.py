@@ -12,6 +12,11 @@ class LimitedList(UserList):
     """
 
     def __init__(self, initlist=None, limit: int=None):
+        """
+        :param initlist: initializing list of items
+        :param limit: limit to set for the count of items, to be set on construction, read-only property later. If the
+                      limit is None or 0 the list is unlimited
+        """
         if limit < 0:
             raise ValueError("Limit cannot be negative")
         if limit is not None and limit != 0:
@@ -23,6 +28,9 @@ class LimitedList(UserList):
 
     @property
     def limit(self) -> int:
+        """
+        :return: the limit set on construction
+        """
         return self._limit
 
     def append(self, item: _T) -> None:
