@@ -1,8 +1,8 @@
 from collections.__init__ import UserList
 from typing import TypeVar, Iterable as Iterable
 
-_T = TypeVar('_T')
-_LimitedListT = TypeVar('_LimitedListT')
+T = TypeVar('T')
+LimitedListT = TypeVar('LimitedListT')
 
 
 class LimitedList(UserList):
@@ -35,31 +35,31 @@ class LimitedList(UserList):
         """
         return self._limit
 
-    def append(self, item: _T) -> None:
+    def append(self, item: T) -> None:
         if self._limit is not None and self._limit != 0:
             if len(self.data) >= self._limit:
                 raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self._limit))
         super().append(item)
 
-    def insert(self, i: int, item: _T) -> None:
+    def insert(self, i: int, item: T) -> None:
         if self._limit is not None and self._limit != 0:
             if len(self.data) >= self._limit:
                 raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self._limit))
         super().insert(i, item)
 
-    def extend(self, other: Iterable[_T]) -> None:
+    def extend(self, other: Iterable[T]) -> None:
         if self._limit is not None and self._limit != 0:
             if len(self.data) >= self._limit:
                 raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self._limit))
         super().extend(other)
 
-    def __add__(self: _LimitedListT, other: Iterable[_T]) -> _LimitedListT:
+    def __add__(self: LimitedListT, other: Iterable[T]) -> LimitedListT:
         if self.limit is not None and self.limit != 0:
             if len(self.data) >= self.limit:
                 raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self.limit))
         return super().__add__(other)
 
-    def __iadd__(self: _LimitedListT, other: Iterable[_T]) -> _LimitedListT:
+    def __iadd__(self: LimitedListT, other: Iterable[T]) -> LimitedListT:
         if self.limit is not None and self.limit != 0:
             if len(self.data) >= self.limit:
                 raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self.limit))
