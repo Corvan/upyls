@@ -20,22 +20,10 @@ class LimitedList(UserList):
                     raise OverflowError("Size of Initializer is greater than limit")
         self._limit: int = limit
         super(LimitedList, self).__init__(initlist)
-        
+
     @property
     def limit(self) -> int:
         return self._limit
-
-    def __add__(self: _LimitedListT, other: Iterable[_T]) -> _LimitedListT:
-        if self.limit is not None and self.limit != 0:
-            if len(self.data) >= self.limit:
-                raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self.limit))
-        return super().__add__(other)
-
-    def __iadd__(self: _LimitedListT, other: Iterable[_T]) -> _LimitedListT:
-        if self.limit is not None and self.limit != 0:
-            if len(self.data) >= self.limit:
-                raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self.limit))
-        return super().__iadd__(other)
 
     def append(self, item: _T) -> None:
         if self._limit is not None and self._limit != 0:
@@ -54,3 +42,15 @@ class LimitedList(UserList):
             if len(self.data) >= self._limit:
                 raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self._limit))
         super().extend(other)
+
+    def __add__(self: _LimitedListT, other: Iterable[_T]) -> _LimitedListT:
+        if self.limit is not None and self.limit != 0:
+            if len(self.data) >= self.limit:
+                raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self.limit))
+        return super().__add__(other)
+
+    def __iadd__(self: _LimitedListT, other: Iterable[_T]) -> _LimitedListT:
+        if self.limit is not None and self.limit != 0:
+            if len(self.data) >= self.limit:
+                raise OverflowError("This List has got a Limit of {} you cannot add more items".format(self.limit))
+        return super().__iadd__(other)
