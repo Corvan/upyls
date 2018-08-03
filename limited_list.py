@@ -19,8 +19,8 @@ class LimitedList(UserList):
                             later. If the limit is None or 0 the list is unlimited
         :param upper_limit: upper limit to set for the count of items, to be set on construction, read-only property
                             later. If the limit is None or 0 the list is unlimited
-        :raises: ValueError if a negative limit is tried to be passed or upper limit is smaller than lower limit
-        :raises: OverflowError if count of initlist items is smaller than lower or greater than upper limit
+        :raises ValueError: if a negative limit is tried to be passed or upper limit is smaller than lower limit
+        :raises OverflowError: if count of initlist items is smaller than lower or greater than upper limit
         """
 
         LimitedList.__check_limits(initlist, lower_limit, upper_limit)
@@ -43,22 +43,49 @@ class LimitedList(UserList):
         return self._lower_limit
 
     def append(self, item: T) -> None:
+        """
+        Adds an Item to the List
+        :param item: Item to be added to the list
+        :raises OverflowError: if count of items has already reached the upper limit
+        """
         self.__check_add_limit()
         super().append(item)
 
     def insert(self, i: int, item: T) -> None:
+        """
+        Inserts an item into the List at a given index
+        :param i: The index where the items will be inserted
+        :param item: item to be inserted into the list
+        :raises OverflowError: if count of items has already reached the upper limit
+        """
         self.__check_add_limit()
         super().insert(i, item)
 
     def extend(self, other: Iterable[T]) -> None:
+        """
+        Extends the list with another List of equally typed items
+        :param other: list of equally typed items to be added to the list
+        :raises OverflowError: if count of items has already reached the upper limit
+        """
         self.__check_add_limit()
         super().extend(other)
 
     def pop(self, i: int = ...) -> T:
+        """
+        Get the first i items from the list and remove them from it
+        :param i: Count of items to get
+        :return: The first i items from the list
+        :raises OverflowError: if count of items has already reached the lower limit
+        """
         self.__check_delete_limit(i)
         return super().pop(i)
 
     def remove(self, item: T) -> None:
+        """
+        Remove the given item from the list
+        :param item: the item to remove
+        :raises OverflowError: if count of items has already reached the lower limit
+        """
         self.__check_delete_limit()
         super().remove(item)
 
