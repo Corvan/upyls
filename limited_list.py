@@ -23,22 +23,7 @@ class LimitedList(UserList):
         :raises: OverflowError if count of initlist items is smaller than lower or greater than upper limit
         """
 
-        if lower_limit is not None and lower_limit != 0:
-            if lower_limit < 0:
-                raise ValueError("Lower limit cannot be negative")
-            if initlist is not None:
-                if len(initlist) < lower_limit:
-                    raise OverflowError("Size of Initializer is smaller than lower limit")
-        if upper_limit is not None and upper_limit != 0:
-            if upper_limit < 0:
-                raise ValueError("Upper limit cannot be negative")
-            if initlist is not None:
-                if len(initlist) > upper_limit:
-                    raise OverflowError("Size of Initializer is greater than upper limit")
-        if upper_limit is not None and lower_limit is not None:
-            if upper_limit !=0 and lower_limit != 0:
-                if upper_limit < lower_limit:
-                    raise ValueError("Upper limit can not be smaller than lower limit")
+        LimitedList.__check_limits(initlist, lower_limit, upper_limit)
         self._upper_limit: int = upper_limit
         self._lower_limit: int = lower_limit
         super(LimitedList, self).__init__(initlist)
@@ -105,4 +90,23 @@ class LimitedList(UserList):
                 raise OverflowError("This List has got an upper limit of {} you cannot add more items"
                                     .format(self.upper_limit))
         return super().__iadd__(other)
+
+    @staticmethod
+    def __check_limits(self, initlist, lower_limit, upper_limit):
+        if lower_limit is not None and lower_limit != 0:
+            if lower_limit < 0:
+                raise ValueError("Lower limit cannot be negative")
+            if initlist is not None:
+                if len(initlist) < lower_limit:
+                    raise OverflowError("Size of Initializer is smaller than lower limit")
+        if upper_limit is not None and upper_limit != 0:
+            if upper_limit < 0:
+                raise ValueError("Upper limit cannot be negative")
+            if initlist is not None:
+                if len(initlist) > upper_limit:
+                    raise OverflowError("Size of Initializer is greater than upper limit")
+        if upper_limit is not None and lower_limit is not None:
+            if upper_limit != 0 and lower_limit != 0:
+                if upper_limit < lower_limit:
+                    raise ValueError("Upper limit can not be smaller than lower limit")
 
