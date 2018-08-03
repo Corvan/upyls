@@ -35,6 +35,10 @@ class LimitedList(UserList):
             if initlist is not None:
                 if len(initlist) > upper_limit:
                     raise OverflowError("Size of Initializer is greater than upper limit")
+        if upper_limit is not None and lower_limit is not None:
+            if upper_limit !=0 and lower_limit != 0:
+                if upper_limit < lower_limit:
+                    raise ValueError("Upper limit can not be smaller than lower limit")
         self._upper_limit: int = upper_limit
         self._lower_limit: int = lower_limit
         super(LimitedList, self).__init__(initlist)
