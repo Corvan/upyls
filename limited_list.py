@@ -43,56 +43,35 @@ class LimitedList(UserList):
         return self._lower_limit
 
     def append(self, item: T) -> None:
-        if self._upper_limit is not None and self._upper_limit != 0:
-            if len(self.data) >= self._upper_limit:
-                raise OverflowError("This List has got an upper limit of {} you cannot add more items"
-                                    .format(self._upper_limit))
+        self.__check_add_limit()
         super().append(item)
 
     def insert(self, i: int, item: T) -> None:
-        if self._upper_limit is not None and self._upper_limit != 0:
-            if len(self.data) >= self._upper_limit:
-                raise OverflowError("This List has got an upper limit of {} you cannot add more items"
-                                    .format(self._upper_limit))
+        self.__check_add_limit()
         super().insert(i, item)
 
     def extend(self, other: Iterable[T]) -> None:
-        if self._upper_limit is not None and self._upper_limit != 0:
-            if len(self.data) >= self._upper_limit:
-                raise OverflowError("This List has got an upper limit of {} you cannot add more items"
-                                    .format(self._upper_limit))
+        self.__check_add_limit()
         super().extend(other)
 
     def pop(self, i: int = ...) -> T:
-        if self.lower_limit is not None and self.lower_limit != 0:
-            if len(self.data) - i < self.lower_limit:
-                raise OverflowError("This List has got a lower limit of {} you cannot remove requested count of items"
-                                    .format(self.lower_limit))
+        self.__check_delete_limit(i)
         return super().pop(i)
 
     def remove(self, item: T) -> None:
-        if self.lower_limit is not None and self.lower_limit != 0:
-            if len(self.data) <= self.lower_limit:
-                raise OverflowError("This List has got a lower limit of {} you cannot remove more items"
-                                    .format(self.lower_limit))
+        self.__check_delete_limit()
         super().remove(item)
 
     def __add__(self: _LimitedListT, other: Iterable[T]) -> _LimitedListT:
-        if self.upper_limit is not None and self.upper_limit != 0:
-            if len(self.data) >= self.upper_limit:
-                raise OverflowError("This List has got an upper limit of {} you cannot add more items"
-                                    .format(self.upper_limit))
+        self.__check_add_limit()
         return super().__add__(other)
 
     def __iadd__(self: _LimitedListT, other: Iterable[T]) -> _LimitedListT:
-        if self.upper_limit is not None and self.upper_limit != 0:
-            if len(self.data) >= self.upper_limit:
-                raise OverflowError("This List has got an upper limit of {} you cannot add more items"
-                                    .format(self.upper_limit))
+        self.__check_add_limit()
         return super().__iadd__(other)
 
     @staticmethod
-    def __check_limits(self, initlist, lower_limit, upper_limit):
+    def __check_limits(initlist, lower_limit, upper_limit):
         if lower_limit is not None and lower_limit != 0:
             if lower_limit < 0:
                 raise ValueError("Lower limit cannot be negative")
@@ -109,4 +88,20 @@ class LimitedList(UserList):
             if upper_limit != 0 and lower_limit != 0:
                 if upper_limit < lower_limit:
                     raise ValueError("Upper limit can not be smaller than lower limit")
+
+    def __check_add_limit(self):
+        if self._upper_limit is not None and self._upper_limit != 0:
+            if len(self.data) >= self._upper_limit:
+                raise OverflowError("This List has got an upper limit of {} you cannot add more items"
+                                    .format(self._upper_limit))
+
+    def __check_delete_limit(self, i=None):
+        if self.lower_limit is not None and self.lower_limit != 0:
+            if i is not None:
+                if len(self.data) - i < self.lower_limit:
+                    raise OverflowError("This List has got a lower limit of {} you cannot remove requested count of items"
+                                        .format(self.lower_limit))
+            if len(self.data) <= self.lower_limit:
+                raise OverflowError("This List has got a lower limit of {} you cannot remove more items"
+                                    .format(self.lower_limit))
 
