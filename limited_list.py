@@ -19,7 +19,7 @@ class LimitedList(UserList):
                             later. If the limit is None or 0 the list is unlimited
         :param upper_limit: upper limit to set for the count of items, to be set on construction, read-only property
                             later. If the limit is None or 0 the list is unlimited
-        :raises: ValueError if a negative limit is tried to be passed
+        :raises: ValueError if a negative limit is tried to be passed or upper limit is smaller than lower limit
         :raises: OverflowError if count of initlist items is smaller than lower or greater than upper limit
         """
 
