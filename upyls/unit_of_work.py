@@ -116,3 +116,54 @@ class UnitOfWorkMixin(ABC):
         :param old_value: the attributes old value
         """
         self.__dirty_attributes[attribute_name] = {"old_value": old_value, "new_value": new_value, "new": new}
+        if self.manager:
+            self.manager.notify_dirty(self)
+
+
+class UnitOfWorkManager:
+    """
+    class for keeping track of :class UnitOfWorkMixin: objects
+    """
+    def __init__(self):
+        self.__registered_units: List[UnitOfWorkMixin] = []
+        self.__dirty_units: List[UnitOfWorkMixin] = []
+
+    @property
+    def registered_units(self) -> List[UnitOfWorkMixin]:
+        return self.__registered_units
+
+    @property
+    def dirty_units(self) -> List[UnitOfWorkMixin]:
+        return self.__dirty_units
+
+    def register(self, unit: UnitOfWorkMixin):
+        self.registered_units.append(unit)
+
+    def unregister(self, unit: UnitOfWorkMixin):
+        self.registered_units.remove(unit)
+
+    def notify_dirty(self, unit: UnitOfWorkMixin):
+        if unit not in self.registered_units:
+            raise ValueError("Unit of work is unknown")
+        self.dirty_units.append(unit)
+
+    def nottify_clean(self, unit: UnitOfWorkMixin):
+        if unit not in self.registered_units:
+            raise ValueError("Unit of work is unknown")
+        self.dirty_units.remove(unit)
+
+    def commit_dirty_units(self):
+        for unit in self.dirty_units:
+            unit.commit()
+            self.dirty_units.remove(unit)
+
+    def rollback_dirty_units(self):
+        for unit in self.dirty_units:
+            unit.rollback()
+            self.dirty_units.remove(unit)
+
+    def is_registered(self, unit: UnitOfWorkMixin) -> bool:
+        return unit in self.registered_units
+
+    def is_dirty(self, unit: UnitOfWorkMixin) -> bool:
+        return unit in self.dirty_units
