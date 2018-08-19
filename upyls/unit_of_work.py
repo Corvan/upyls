@@ -12,6 +12,27 @@ class UnitOfWorkMixin(ABC):
         if manager:
             self.manager = manager
 
+    @property
+    def manager(self) -> UnitOfWorkManager:
+        return self.manager
+
+    @manager.setter
+    def manager(self, manager: UnitOfWorkManager):
+        if manager is None:
+            del self.manager
+            return
+        if self.manager:
+            self.manager.unregister(self)
+        self.manager = manager
+        if not manager.is_registered(self):
+            manager.register(self)
+
+    @manager.deleter
+    def manager(self):
+        if self.manager:
+            self.manager.unregister(self)
+        self.manager = None
+
     def is_dirty(self, attribute_name) -> bool:
         """
         Checks if an attribute has been changed
@@ -145,9 +166,13 @@ class UnitOfWorkManager:
 
     def register(self, unit: UnitOfWorkMixin):
         self.registered_units.append(unit)
+        if unit.manager != self:
+            unit.manager = self
 
     def unregister(self, unit: UnitOfWorkMixin):
         self.registered_units.remove(unit)
+        if unit.manager == self:
+            unit.manager = None
 
     def notify_dirty(self, unit: UnitOfWorkMixin):
         if unit not in self.registered_units:
