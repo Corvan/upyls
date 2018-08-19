@@ -40,7 +40,6 @@ class UnitOfWorkMixin(ABC):
         :param attribute_value: The attribute's value the name is queried for
         :return: the attribute's name
         """
-        attr_type = type(attribute_value)
         attr_id = id(attribute_value)
         for itemname, itemvalue in self.__dict__.items():
             if id(itemvalue) == attr_id:
