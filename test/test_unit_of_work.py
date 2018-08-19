@@ -21,25 +21,25 @@ class TestUnitOfWork(unittest.TestCase):
     def test_old_value(self):
         uow = MyUnitOfWork()
         uow.an_attribute = "Test"
-        self.assertEquals(uow.old_value("an_attribute"), None)
+        self.assertEqual(uow.old_value("an_attribute"), None)
         uow.an_attribute = "Next"
-        self.assertEquals(uow.old_value("an_attribute"), "Test")
+        self.assertEqual(uow.old_value("an_attribute"), "Test")
 
     def test_get_attribute_name(self):
         uow = MyUnitOfWork()
-        self.assertEquals(uow.get_attribute_name(uow.another_attribute), "another_attribute")
+        self.assertEqual(uow.get_attribute_name(uow.another_attribute), "another_attribute")
 
     def test_get_dirty_attributes_names(self):
         uow = MyUnitOfWork()
         uow.an_attribute = "Test"
         uow.another_attribute = "Next"
-        self.assertEquals(["an_attribute", "another_attribute"], uow.get_dirty_attributes_names())
+        self.assertEqual(["an_attribute", "another_attribute"], uow.get_dirty_attributes_names())
 
     def test_get_dirty_attributes(self):
         uow = MyUnitOfWork()
         uow.an_attribute = "Test"
         uow.another_attribute = "Next"
-        self.assertEquals({"an_attribute": {"old_value": None, "new_value": "Test"},
+        self.assertEqual({"an_attribute": {"old_value": None, "new_value": "Test"},
                            "another_attribute": {"old_value": "Test", "new_value": "Next"}},
                           uow.get_dirty_attributes())
 
