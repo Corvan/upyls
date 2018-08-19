@@ -1,13 +1,16 @@
+from __future__ import annotations
 from abc import ABC
-from typing import Dict, Any
+from typing import Dict, Any, List
 
 
 class UnitOfWorkMixin(ABC):
     """
     A mixin which makes a class provide Unit of Work functionality if you derive from it
     """
-    def __init__(self):
+    def __init__(self, manager: UnitOfWorkManager=None):
         self.__dirty_attributes: Dict = {}
+        if manager:
+            self.manager = manager
 
     def is_dirty(self, attribute_name) -> bool:
         """
@@ -72,11 +75,15 @@ class UnitOfWorkMixin(ABC):
 
     def commit(self):
         self.__dict__["_UnitOfWorkMixin__dirty_attributes"] = {}
+        if self.manager:
+            self.manager.nottify_clean(self)
 
     def rollback(self):
         for attribute in self.__dirty_attributes:
             self.__dict__[attribute] = self.__dirty_attributes[attribute]["old_value"]
         self.__dict__["_UnitOfWorkMixin__dirty_attributes"] = {}
+        if self.manager:
+            self.manager.nottify_clean(self)
 
     def __setattr__(self, attribute: str, value):
         if hasattr(self, attribute):
