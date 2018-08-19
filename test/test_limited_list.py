@@ -1,6 +1,6 @@
 import unittest
 
-from limited_list import LimitedList
+from upyls import LimitedList
 
 
 class MyTestCase(unittest.TestCase):

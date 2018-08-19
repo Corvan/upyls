@@ -65,7 +65,7 @@ class LimitedList(UserList):
         """
         Extends the list with another List of equally typed items
         :param other: list of equally typed items to be added to the list
-        :raises OverflowError: if count of items has already reached the upper limit
+        :raise OverflowError: if count of items has already reached the upper limit
         """
         self.__check_add_limit()
         super().extend(other)
