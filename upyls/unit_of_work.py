@@ -85,11 +85,11 @@ class UnitOfWorkMixin(ABC):
                 self._dirty(attribute, False, value, None)
                 self.__dict__[attribute] = value
             else:
-                self.__update_attribute(attribute, value)
+                self._update_attribute(attribute, value)
         else:
             self._create_attribute(attribute, value)
 
-    def __update_attribute(self, attribute_name: str, value):
+    def _update_attribute(self, attribute_name: str, value):
         """
         Update an attribute
         :param attribute_name: the attribute's name
@@ -143,30 +143,28 @@ class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
         """
         return self.__manager
 
-    @manager.setter
-    def manager(self, manager: UnitOfWorkManager):
+    def set_manager(self, manager: UnitOfWorkManager):
         """
         set the connected manager for this instance and register this instance with the passed manager
         :param manager: the manager this instance should be connected with
         """
         if manager is None:
-            del self.manager
+            if self.__manager:
+                self.__manager.unregister(self)
+                self.remove_manager()
             return
-        if self.manager:
-            self.manager.unregister(self)
-        if self.__manager is not None:
+        if manager is not None:
             self.__manager = manager
             if not manager.is_registered(self):
                 manager.register(self)
 
-    @manager.deleter
-    def manager(self):
+    def remove_manager(self):
         """
         Remove the connection between this instance and its manager. Also deregisters this instance with the previously
         connected manager before removing the manager.
         """
-        if self.manager:
-            self.manager.unregister(self)
+        if self.__manager:
+            self.__manager.unregister(self)
         self.__manager = None
 
     def commit(self):
@@ -208,7 +206,7 @@ class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
                 self._dirty(attribute, False, value, None)
                 self.__dict__[attribute] = value
             else:
-                self.__update_attribute(attribute, value)
+                self._update_attribute(attribute, value)
         else:
             self._create_attribute(attribute, value)
             
@@ -234,7 +232,7 @@ class UnitOfWorkManager:
         """
         self.registered_units.append(unit)
         if unit.manager != self:
-            unit.manager = self
+            unit.set_manager(self)
 
     def unregister(self, unit: ManageableUnitOfWorkMixin):
         """
@@ -243,8 +241,8 @@ class UnitOfWorkManager:
         :param unit: the manageable Unit of work to be unregistered
         """
         self.registered_units.remove(unit)
-        if unit.manager == self:
-            unit.manager = None
+        if unit.remove_manager == self:
+            unit.remove_manager(self)
 
     @property
     def registered_units(self) -> List[ManageableUnitOfWorkMixin]:
@@ -283,7 +281,8 @@ class UnitOfWorkManager:
         """
         if unit not in self.registered_units:
             raise ValueError("Unit of work is unknown")
-        self.dirty_units.remove(unit)
+        if unit in self.dirty_units:
+            self.dirty_units.remove(unit)
 
     def commit_dirty_units(self):
         """
