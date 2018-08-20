@@ -177,7 +177,7 @@ class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
         """
         super(ManageableUnitOfWorkMixin, self).commit()
         if self.manager:
-            self.manager.nottify_clean(self)
+            self.manager.notify_clean(self)
 
     def rollback(self):
         """
@@ -187,7 +187,7 @@ class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
         """
         super(ManageableUnitOfWorkMixin, self).rollback()
         if self.manager:
-            self.manager.nottify_clean(self)
+            self.manager.notify_clean(self)
 
     def __dirty(self, attribute_name: str, new: bool, new_value, old_value=None):
         """
