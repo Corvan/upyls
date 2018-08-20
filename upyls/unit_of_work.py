@@ -82,12 +82,12 @@ class UnitOfWorkMixin(ABC):
     def __setattr__(self, attribute: str, value):
         if hasattr(self, attribute):
             if self.__getattribute__(attribute) is None:
-                self.__dirty(attribute, False, value, None)
+                self._dirty(attribute, False, value, None)
                 self.__dict__[attribute] = value
             else:
                 self.__update_attribute(attribute, value)
         else:
-            self.__create_attribute(attribute, value)
+            self._create_attribute(attribute, value)
 
     def __update_attribute(self, attribute_name: str, value):
         """
@@ -97,10 +97,10 @@ class UnitOfWorkMixin(ABC):
         :return:
         """
         old_value = getattr(self, attribute_name)
-        self.__dirty(attribute_name, False, value, old_value)
+        self._dirty(attribute_name, False, value, old_value)
         self.__dict__[attribute_name] = value
 
-    def __create_attribute(self, attribute: str, value):
+    def _create_attribute(self, attribute: str, value):
         """
         create a new Attribute for this class
         :param attribute: the attribute's name
@@ -108,7 +108,7 @@ class UnitOfWorkMixin(ABC):
         """
         self.__dict__[attribute] = value
 
-    def __dirty(self, attribute_name: str, new: bool, new_value, old_value=None):
+    def _dirty(self, attribute_name: str, new: bool, new_value, old_value=None):
         """
         Mark an attribute as dirty
         :param attribute_name: the attributes name
@@ -189,7 +189,7 @@ class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
         if self.manager:
             self.manager.notify_clean(self)
 
-    def __dirty(self, attribute_name: str, new: bool, new_value, old_value=None):
+    def _dirty(self, attribute_name: str, new: bool, new_value, old_value=None):
         """
         Like in the dirty-method of :super: an attribute is marked as dirty. Additionally if this instance is connected
         with a manager, the manager is notified that this instance is dirty
@@ -198,9 +198,22 @@ class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
         :param new_value: the attribute's new value
         :param old_value: the attribute's old value
         """
-        super(ManageableUnitOfWorkMixin, self).__dirty(attribute_name, new, new_value, old_value)
+        super(ManageableUnitOfWorkMixin, self)._dirty(attribute_name, new, new_value, old_value)
         if self.manager is not None:
             self.manager.notify_dirty(self)
+
+    def __setattr__(self, attribute: str, value):
+        if hasattr(self, attribute):
+            if self.__getattribute__(attribute) is None:
+                self._dirty(attribute, False, value, None)
+                self.__dict__[attribute] = value
+            else:
+                self.__update_attribute(attribute, value)
+        else:
+            self._create_attribute(attribute, value)
+            
+    def _create_attribute(self, attribute: str, value):
+        super(ManageableUnitOfWorkMixin, self)._create_attribute(attribute, value)
 
 
 class UnitOfWorkManager:
