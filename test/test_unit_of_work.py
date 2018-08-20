@@ -1,6 +1,7 @@
 import unittest
 
-from upyls import UnitOfWorkMixin
+from upyls import UnitOfWorkMixin, UnitOfWorkManager
+from upyls.unit_of_work import ManageableUnitOfWorkMixin
 
 
 class MyUnitOfWork(UnitOfWorkMixin):
@@ -55,6 +56,83 @@ class TestUnitOfWork(unittest.TestCase):
         uow.rollback()
         self.assertEqual(None, uow.an_attribute)
         self.assertFalse(uow.is_dirty("an_attribute"))
+
+
+class ManagedUnitOfWork(ManageableUnitOfWorkMixin):
+
+    def __init__(self, manager: UnitOfWorkManager=None):
+        super(ManagedUnitOfWork, self).__init__(manager)
+        self.an_attribute: str = None
+        self.another_attribute = "Test"
+
+
+class TestUnitOfWorkManager(unittest.TestCase):
+
+    def test_init_manager(self):
+        manager = UnitOfWorkManager()
+        unit = ManagedUnitOfWork(manager)
+        self.assertEqual(manager, unit.manager)
+        self.assertEqual(unit, manager.registered_units[0])
+        self.assertEqual([], unit.get_dirty_attributes_names())
+
+    def test_get_registered(self):
+        manager = UnitOfWorkManager()
+        unit1 = ManagedUnitOfWork(manager)
+        unit2 = ManagedUnitOfWork(manager)
+        self.assertEqual([unit1, unit2], manager.registered_units)
+
+    def test_get_dirty(self):
+        manager = UnitOfWorkManager()
+        unit = ManagedUnitOfWork(manager)
+        unit.an_attribute = "Test"
+        self.assertEqual(unit, manager.dirty_units[0])
+
+    def test_commit(self):
+        manager = UnitOfWorkManager()
+        unit1 = ManagedUnitOfWork(manager)
+        unit2 = ManagedUnitOfWork(manager)
+        unit1.an_attribute = "Test1"
+        unit2.an_attribute = "Test2"
+        manager.commit_dirty_units()
+        self.assertEqual([], manager.dirty_units)
+
+    def test_rollback(self):
+        manager = UnitOfWorkManager()
+        unit1 = ManagedUnitOfWork(manager)
+        unit2 = ManagedUnitOfWork(manager)
+        unit1.an_attribute = "Test1"
+        unit2.an_attribute = "Test2"
+        manager.rollback_dirty_units()
+        self.assertEqual([], manager.dirty_units)
+        self.assertEqual(None, unit1.an_attribute)
+        self.assertEqual(None, unit2.an_attribute)
+
+    def test_is_registered_previously_registered(self):
+        manager = UnitOfWorkManager()
+        unit1 = ManagedUnitOfWork(manager)
+        unit2 = ManagedUnitOfWork()
+        unit3 = ManagedUnitOfWork()
+        unit3.set_manager(manager)
+        manager.register(unit2)
+        self.assertTrue(manager.is_registered(unit1))
+        self.assertTrue(manager.is_registered(unit2))
+        self.assertTrue(manager.is_registered(unit3))
+
+    def test_is_registered_previously_not_registered(self):
+        manager = UnitOfWorkManager()
+        unit = ManagedUnitOfWork()
+        self.assertFalse(manager.is_registered(unit))
+
+    def test_is_dirty_with_dirty_unit(self):
+        manager = UnitOfWorkManager()
+        unit = ManagedUnitOfWork(manager)
+        unit.an_attribute = "Test"
+        self.assertTrue(manager.is_dirty(unit))
+
+    def test_is_dirty_with_clean_unit(self):
+        manager = UnitOfWorkManager()
+        unit = ManagedUnitOfWork(manager)
+        self.assertFalse(manager.is_dirty(unit))
 
 
 if __name__ == '__main__':
