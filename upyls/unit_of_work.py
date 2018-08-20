@@ -120,8 +120,16 @@ class UnitOfWorkMixin(ABC):
 
 
 class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
+    """
+    Extends :class UnitOfWorkMixin: with manageability. This means that this mixin is prepared to be managed by a
+    :class UnitOfWorkManager: there can be multiple instances of this class be managed by a :class UnitOfWorkManager:.
+    """
 
     def __init__(self, manager: UnitOfWorkManager=None):
+        """
+        Construct a manageable Unit of work mixin
+        :param manager: optional, if the created instance should already be connected with a manager
+        """
         super(ManageableUnitOfWorkMixin, self).__init__()
         self.__manager = manager
         if self.__manager:
@@ -129,10 +137,18 @@ class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
 
     @property
     def manager(self) -> UnitOfWorkManager:
+        """
+        get the connected manager of this instance
+        :return: the instance of the manager this class is connected with
+        """
         return self.__manager
 
     @manager.setter
     def manager(self, manager: UnitOfWorkManager):
+        """
+        set the connected manager for this instance and register this instance with the passed manager
+        :param manager: the manager this instance should be connected with
+        """
         if manager is None:
             del self.manager
             return
@@ -145,21 +161,43 @@ class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
 
     @manager.deleter
     def manager(self):
-        if self.manager is not None:
+        """
+        Remove the connection between this instance and its manager. Also deregisters this instance with the previously
+        connected manager before removing the manager.
+        """
+        if self.manager:
             self.manager.unregister(self)
-        self.manager = None
+        self.__manager = None
 
     def commit(self):
+        """
+        Like the commit method of :super: the new value of dirty attributes is kept and the old value discarded.
+        Additionally if this instance is connected with a manager, the manager is notified that this instance clean
+        again
+        """
         super(ManageableUnitOfWorkMixin, self).commit()
         if self.manager:
             self.manager.nottify_clean(self)
 
     def rollback(self):
+        """
+        Like the rollback method of :super: the new value of dirty attributes is discarded and the old value restored.
+        Additionally if this instance is connected with a amanger, the manager is notified that this instance is clean
+        again
+        """
         super(ManageableUnitOfWorkMixin, self).rollback()
         if self.manager:
             self.manager.nottify_clean(self)
 
     def __dirty(self, attribute_name: str, new: bool, new_value, old_value=None):
+        """
+        Like in the dirty-method of :super: an attribute is marked as dirty. Additionally if this instance is connected
+        with a manager, the manager is notified that this instance is dirty
+        :param attribute_name: the name of the attribute to mark as dirty
+        :param new: indicate that this attribute is a new attribute, which has not existed before
+        :param new_value: the attribute's new value
+        :param old_value: the attribute's old value
+        """
         super(ManageableUnitOfWorkMixin, self).__dirty(attribute_name, new, new_value, old_value)
         if self.manager is not None:
             self.manager.notify_dirty(self)
@@ -175,44 +213,90 @@ class UnitOfWorkManager:
 
     @property
     def registered_units(self) -> List[ManageableUnitOfWorkMixin]:
+        """
+
+        :return:
+        """
         return self.__registered_units
 
     @property
     def dirty_units(self) -> List[ManageableUnitOfWorkMixin]:
+        """
+
+        :return:
+        """
         return self.__dirty_units
 
     def register(self, unit: ManageableUnitOfWorkMixin):
+        """
+
+        :param unit:
+        :return:
+        """
         self.registered_units.append(unit)
         if unit.manager != self:
             unit.manager = self
 
     def unregister(self, unit: ManageableUnitOfWorkMixin):
+        """
+
+        :param unit:
+        :return:
+        """
         self.registered_units.remove(unit)
         if unit.manager == self:
             unit.manager = None
 
     def notify_dirty(self, unit: ManageableUnitOfWorkMixin):
+        """
+
+        :param unit:
+        :return:
+        """
         if unit not in self.registered_units:
             raise ValueError("Unit of work is unknown")
         self.dirty_units.append(unit)
 
     def nottify_clean(self, unit: ManageableUnitOfWorkMixin):
+        """
+
+        :param unit:
+        :return:
+        """
         if unit not in self.registered_units:
             raise ValueError("Unit of work is unknown")
         self.dirty_units.remove(unit)
 
     def commit_dirty_units(self):
+        """
+
+        :return:
+        """
         for unit in self.dirty_units:
             unit.commit()
             self.dirty_units.remove(unit)
 
     def rollback_dirty_units(self):
+        """
+
+        :return:
+        """
         for unit in self.dirty_units:
             unit.rollback()
             self.dirty_units.remove(unit)
 
     def is_registered(self, unit: ManageableUnitOfWorkMixin) -> bool:
+        """
+
+        :param unit:
+        :return:
+        """
         return unit in self.registered_units
 
     def is_dirty(self, unit: ManageableUnitOfWorkMixin) -> bool:
+        """
+
+        :param unit:
+        :return:
+        """
         return unit in self.dirty_units
