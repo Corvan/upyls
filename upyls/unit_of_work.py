@@ -205,33 +205,19 @@ class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
 
 class UnitOfWorkManager:
     """
-    class for keeping track of :class UnitOfWorkMixin: objects
+    class for keeping track of :class UnitOfWorkMixin: objects. So instances of classes, which derive from
+    :class ManageableUnitOfWorkMixin: and which are registered with an instance of this class will call the
+    notify-method when they get changed.
     """
     def __init__(self):
         self.__registered_units: List[ManageableUnitOfWorkMixin] = []
         self.__dirty_units: List[ManageableUnitOfWorkMixin] = []
 
-    @property
-    def registered_units(self) -> List[ManageableUnitOfWorkMixin]:
-        """
-
-        :return:
-        """
-        return self.__registered_units
-
-    @property
-    def dirty_units(self) -> List[ManageableUnitOfWorkMixin]:
-        """
-
-        :return:
-        """
-        return self.__dirty_units
-
     def register(self, unit: ManageableUnitOfWorkMixin):
         """
-
-        :param unit:
-        :return:
+        Register manageable Units of Work with this manager instance. Additionally set this instance as the unit's
+        manager
+        :param unit: a manageable Unit of Work to be registered
         """
         self.registered_units.append(unit)
         if unit.manager != self:
@@ -239,28 +225,47 @@ class UnitOfWorkManager:
 
     def unregister(self, unit: ManageableUnitOfWorkMixin):
         """
-
-        :param unit:
-        :return:
+        Unregister a previously registered manageable Unit of work from this manager instance. Additionally remove this
+        as the unit's manager
+        :param unit: the manageable Unit of work to be unregistered
         """
         self.registered_units.remove(unit)
         if unit.manager == self:
             unit.manager = None
 
+    @property
+    def registered_units(self) -> List[ManageableUnitOfWorkMixin]:
+        """
+        Get the Units of Work, which have been registered with this instance
+        :return: all Units registered with this instance
+        """
+        return self.__registered_units
+
+    @property
+    def dirty_units(self) -> List[ManageableUnitOfWorkMixin]:
+        """
+        Get the (registered) Units of Work, which have been marked as dirty
+        :return:
+        """
+        return self.__dirty_units
+
     def notify_dirty(self, unit: ManageableUnitOfWorkMixin):
         """
-
-        :param unit:
+        Notify this manager instance that a manageable Unit of Work has been changed. This method is called by instances
+        :class ManageableUnitOfWorkMixin: when one of their attributes change, when those instances have got this
+        instance as their manager.
+        :param unit: the manageable Unit of Work that has changed
         :return:
         """
         if unit not in self.registered_units:
             raise ValueError("Unit of work is unknown")
         self.dirty_units.append(unit)
 
-    def nottify_clean(self, unit: ManageableUnitOfWorkMixin):
+    def notify_clean(self, unit: ManageableUnitOfWorkMixin):
         """
-
-        :param unit:
+        Notify this manager instance that a manageable Unit of Work has been either commited or rolled back and now is
+        clean again
+        :param unit: the manageable Unit of Work, which is clean again
         :return:
         """
         if unit not in self.registered_units:
@@ -269,8 +274,7 @@ class UnitOfWorkManager:
 
     def commit_dirty_units(self):
         """
-
-        :return:
+        Go through all (registered) manageable Units of Work and commit their changes.
         """
         for unit in self.dirty_units:
             unit.commit()
@@ -278,8 +282,7 @@ class UnitOfWorkManager:
 
     def rollback_dirty_units(self):
         """
-
-        :return:
+        Go through all (registered) manageable Units of Work and rollback their changes.
         """
         for unit in self.dirty_units:
             unit.rollback()
@@ -287,7 +290,7 @@ class UnitOfWorkManager:
 
     def is_registered(self, unit: ManageableUnitOfWorkMixin) -> bool:
         """
-
+        Check if a manageable Unit of Work is registered with this manager instance
         :param unit:
         :return:
         """
@@ -295,8 +298,8 @@ class UnitOfWorkManager:
 
     def is_dirty(self, unit: ManageableUnitOfWorkMixin) -> bool:
         """
-
-        :param unit:
-        :return:
+        Check if a manageable Unit of Work has been marked as dirty
+        :param unit: the manageable Unit of work to check
+        :return: True if the unit is marked as dirty, False otherwise
         """
         return unit in self.dirty_units
