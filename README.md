@@ -1,12 +1,18 @@
 # upyls - A collection of Python utilities
 
+This library can now be found on [PyPi](https://pypi.org/project/upyls/)
+or simply installed with:
+```bash
+pip install upyls
+```
+
 ## Limited List
 
 A List which can have a lower limit nd an upper limit set and only be filled with the number of items set by those 
 limits
 
 Just import and instantiate it
-```
+```python
 from upyls import LimitedList
 limited_list = LimitedList(lower=0, upper=1)
 ```
@@ -21,7 +27,7 @@ and your class gets the functionality of this mixin
 class. 
 
 For example:
-```
+```python
 from upyls import UnitOfWorkMixin
 
 class MyUnitOfWork(UnitOfWorkMixin):
