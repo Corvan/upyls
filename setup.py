@@ -19,7 +19,7 @@ setup(
             "Programming Language :: Python :: 3.7",
             "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
             "Operating System :: OS Independent",
-            "Topic :: Software Development :: Libraries :: Python Modules"
+            "Topic :: Software Development :: Libraries :: Python Modules",
             "Topic :: Utilities"
         ]
 )
