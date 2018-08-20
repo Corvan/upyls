@@ -7,31 +7,8 @@ class UnitOfWorkMixin(ABC):
     """
     A mixin which makes a class provide Unit of Work functionality if you derive from it
     """
-    def __init__(self, manager: UnitOfWorkManager=None):
+    def __init__(self):
         self.__dirty_attributes: Dict = {}
-        if manager:
-            self.manager = manager
-
-    @property
-    def manager(self) -> UnitOfWorkManager:
-        return self.manager
-
-    @manager.setter
-    def manager(self, manager: UnitOfWorkManager):
-        if manager is None:
-            del self.manager
-            return
-        if self.manager:
-            self.manager.unregister(self)
-        self.manager = manager
-        if not manager.is_registered(self):
-            manager.register(self)
-
-    @manager.deleter
-    def manager(self):
-        if self.manager:
-            self.manager.unregister(self)
-        self.manager = None
 
     def is_dirty(self, attribute_name) -> bool:
         """
@@ -96,15 +73,11 @@ class UnitOfWorkMixin(ABC):
 
     def commit(self):
         self.__dict__["_UnitOfWorkMixin__dirty_attributes"] = {}
-        if self.manager:
-            self.manager.nottify_clean(self)
 
     def rollback(self):
         for attribute in self.__dirty_attributes:
             self.__dict__[attribute] = self.__dirty_attributes[attribute]["old_value"]
         self.__dict__["_UnitOfWorkMixin__dirty_attributes"] = {}
-        if self.manager:
-            self.manager.nottify_clean(self)
 
     def __setattr__(self, attribute: str, value):
         if hasattr(self, attribute):
@@ -144,7 +117,51 @@ class UnitOfWorkMixin(ABC):
         :param old_value: the attributes old value
         """
         self.__dirty_attributes[attribute_name] = {"old_value": old_value, "new_value": new_value, "new": new}
+
+
+class ManageableUnitOfWorkMixin(UnitOfWorkMixin, ABC):
+
+    def __init__(self, manager: UnitOfWorkManager=None):
+        super(ManageableUnitOfWorkMixin, self).__init__()
+        self.__manager = manager
+        if self.__manager:
+            self.__manager.register(self)
+
+    @property
+    def manager(self) -> UnitOfWorkManager:
+        return self.__manager
+
+    @manager.setter
+    def manager(self, manager: UnitOfWorkManager):
+        if manager is None:
+            del self.manager
+            return
         if self.manager:
+            self.manager.unregister(self)
+        if self.__manager is not None:
+            self.__manager = manager
+            if not manager.is_registered(self):
+                manager.register(self)
+
+    @manager.deleter
+    def manager(self):
+        if self.manager is not None:
+            self.manager.unregister(self)
+        self.manager = None
+
+    def commit(self):
+        super(ManageableUnitOfWorkMixin, self).commit()
+        if self.manager:
+            self.manager.nottify_clean(self)
+
+    def rollback(self):
+        super(ManageableUnitOfWorkMixin, self).rollback()
+        if self.manager:
+            self.manager.nottify_clean(self)
+
+    def __dirty(self, attribute_name: str, new: bool, new_value, old_value=None):
+        super(ManageableUnitOfWorkMixin, self).__dirty(attribute_name, new, new_value, old_value)
+        if self.manager is not None:
             self.manager.notify_dirty(self)
 
 
@@ -153,33 +170,33 @@ class UnitOfWorkManager:
     class for keeping track of :class UnitOfWorkMixin: objects
     """
     def __init__(self):
-        self.__registered_units: List[UnitOfWorkMixin] = []
-        self.__dirty_units: List[UnitOfWorkMixin] = []
+        self.__registered_units: List[ManageableUnitOfWorkMixin] = []
+        self.__dirty_units: List[ManageableUnitOfWorkMixin] = []
 
     @property
-    def registered_units(self) -> List[UnitOfWorkMixin]:
+    def registered_units(self) -> List[ManageableUnitOfWorkMixin]:
         return self.__registered_units
 
     @property
-    def dirty_units(self) -> List[UnitOfWorkMixin]:
+    def dirty_units(self) -> List[ManageableUnitOfWorkMixin]:
         return self.__dirty_units
 
-    def register(self, unit: UnitOfWorkMixin):
+    def register(self, unit: ManageableUnitOfWorkMixin):
         self.registered_units.append(unit)
         if unit.manager != self:
             unit.manager = self
 
-    def unregister(self, unit: UnitOfWorkMixin):
+    def unregister(self, unit: ManageableUnitOfWorkMixin):
         self.registered_units.remove(unit)
         if unit.manager == self:
             unit.manager = None
 
-    def notify_dirty(self, unit: UnitOfWorkMixin):
+    def notify_dirty(self, unit: ManageableUnitOfWorkMixin):
         if unit not in self.registered_units:
             raise ValueError("Unit of work is unknown")
         self.dirty_units.append(unit)
 
-    def nottify_clean(self, unit: UnitOfWorkMixin):
+    def nottify_clean(self, unit: ManageableUnitOfWorkMixin):
         if unit not in self.registered_units:
             raise ValueError("Unit of work is unknown")
         self.dirty_units.remove(unit)
@@ -194,8 +211,8 @@ class UnitOfWorkManager:
             unit.rollback()
             self.dirty_units.remove(unit)
 
-    def is_registered(self, unit: UnitOfWorkMixin) -> bool:
+    def is_registered(self, unit: ManageableUnitOfWorkMixin) -> bool:
         return unit in self.registered_units
 
-    def is_dirty(self, unit: UnitOfWorkMixin) -> bool:
+    def is_dirty(self, unit: ManageableUnitOfWorkMixin) -> bool:
         return unit in self.dirty_units

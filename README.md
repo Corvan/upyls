@@ -35,4 +35,8 @@ value will be discarded. As in database transactions you can as well rollback, w
 back into place and the new Value discarded. As well as with committing, the rollback-method leads to the instance not 
 being marked as dirty anymore.
 
-### UnitOfWorkManager
+### Managing Unit of Works 
+
+#### ManageableUnitOfWorkMixin
+
+#### UnitOfWorkManager
