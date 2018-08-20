@@ -53,7 +53,7 @@ class TestUnitOfWork(unittest.TestCase):
         uow = MyUnitOfWork()
         uow.an_attribute = "Test"
         uow.rollback()
-        self.assertEquals(None, uow.an_attribute)
+        self.assertEqual(None, uow.an_attribute)
         self.assertFalse(uow.is_dirty("an_attribute"))
 
 
