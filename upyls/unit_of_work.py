@@ -289,17 +289,21 @@ class UnitOfWorkManager:
         """
         Go through all (registered) manageable Units of Work and commit their changes.
         """
-        for unit in self.dirty_units:
+        dirty_units = self.dirty_units.copy()
+        for unit in dirty_units:
             unit.commit()
-            self.dirty_units.remove(unit)
+            if unit in self.dirty_units:
+                self.dirty_units.remove(unit)
 
     def rollback_dirty_units(self):
         """
         Go through all (registered) manageable Units of Work and rollback their changes.
         """
-        for unit in self.dirty_units:
+        dirty_units = self.dirty_units.copy()
+        for unit in dirty_units:
             unit.rollback()
-            self.dirty_units.remove(unit)
+            if unit in self.dirty_units:
+                self.dirty_units.remove(unit)
 
     def is_registered(self, unit: ManageableUnitOfWorkMixin) -> bool:
         """
