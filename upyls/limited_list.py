@@ -1,11 +1,11 @@
 from collections import UserList
-from typing import TypeVar, Iterable as Iterable
+from typing import TypeVar, Iterable as Iterable, Generic
 
 T = TypeVar('T')
 _LimitedListT = TypeVar('_LimitedListT')
 
 
-class LimitedList(UserList):
+class LimitedList(UserList, Generic[T]):
     """
     Represents a List, which is Limited in its size.
     If a lower limit is set the list will refuse to have less items than this limit. If the List is filled with as many
