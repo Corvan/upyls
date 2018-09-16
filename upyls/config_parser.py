@@ -139,16 +139,18 @@ class MultiIniParser:
                 actual_section.options.append(Option(key=option, value=value,
                                                      section=actual_section))
 
-    def get_sections_by_name(self, section_name) -> Union[Section, Iterable[Section]]:
+    def get_sections_by_name(self, section_name) -> Union[Section, Iterable[Section], None]:
         """
         retrieve a collection of :Section:, which bear the passed name
         :param section_name: the name of the sections to be retrieved, if :None: is passed the top level section without
         a name is returned
-        :return: a collection of :Section:s
+        :return: the top level :Section: without a name when :None: is passed as Section's name or
+        a collection of :Section:s bearing the passed name or :None: if no section can be found with that name
         """
         if section_name is None:
             return self._top_section
-        return [section for section in self.sections if section_name == section.name]
+        sections = [section for section in self.sections if section_name == section.name]
+        return sections if len(sections) != 0 else None
 
     def get(self, section_name: Union[str, None], option_name: str) -> Iterable[Option]:
         """
