@@ -5,7 +5,26 @@ from typing import Union, IO, List
 class MultiIniParser:
     """
     Ini-File configuration parser that is able to read config files containing multiple sections and options with the
-    same name
+    same name. This class takes the ideas and some code of :class configparser.ConfigParser: from the Python Standard-library and
+    extends those to its cause. Additionally it strives for an easier readablity as the original.
+
+    Example INI-File::
+        option1: first option
+        [section]
+        option2: second option
+        option2: second second option
+        [section]
+        option3: third option
+        option3: second third option
+
+    can be accessed with::
+        parser = MultiIniParser()
+        parser.read(ini_file)
+        option1 = parser[None][0]["option1"][0]
+        option2_1 = parser["section"][0]["option2"[0]
+        option2_2 = parser["section"][0]["option2"[1]
+        option3_1 = parser["section"][1]["option3"[0]
+        option3_2 = parser["section"][1]["option3"[1]
     """
 
     _SECTION_TEMPLATE = r"""
@@ -76,6 +95,7 @@ class MultiIniParser:
                 value = option_match.group("value")
                 actual_section.options.append(Option(key=option, value=value,
                                                      section=actual_section))
+
     def __getitem__(self, key: Union[str, None]) -> List[Section]:
         if key is None:
             return [self._top_section]
