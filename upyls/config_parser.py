@@ -25,6 +25,10 @@ class Section:
     """
 
     def __init__(self, name: str=None):
+        """
+        Create a :Section:
+        :param name: the :Section:'s name or None if the top level section without name is to be used
+        """
         self.name: str = name
         self.options: List[Option] = []
 
