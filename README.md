@@ -61,3 +61,24 @@ functionality of its parent.
 This class offers the functionality to manage a collection of (manageable) Units of Work. It will keep track of 
 registered units that have changed and you can commit all changed units or roll them all back. Of cource you can ask the
 manager if a certain unit is registered or if it is dirty. 
+
+## MultiIniParser
+The INI-File-Format is around for quite some time and in times of XML and JSON some people might find this format quite 
+archaic, but it is still used in many software projects. There is no real standard for this format, it is rather a set of 
+common practices that define the format. 
+Mostly an INI-File has got a set of sections whcih have Options with values associated with them:
+```ini
+[section]
+option=value
+```
+Python has got a very good and rich implementation of a parser with `configparser.ConfigParser` but it does not have 
+support for INI-Files that can have multiple sections or options with the same name or a contain a top level section
+without a name. While the second case can be worked around the first can not in a simple way. 
+This might be a pretty rare usecase, because in most implementations section and option names have to be unique. But as uncle Murphy turned round 
+the corner, the author stumbled over a service that communicates with a variant of INI-files, which has got an empty 
+top level section AND multiple sections with the same name as well as options with the same name. After having a look at
+`configparser.ConfigParser` and how to best subclass it, the author decided to take the ideas and some of the code and 
+turn them to an own class, while it is not impropable that it somewhen will become a subclass of 
+`configparser.ConfigParser`. It is not meant to steal but meant to extend the functionality in a way that keeps the 
+ideas and interfaces. But in some things it behaves a bit different due to the fact of multiple items. So it often 
+returns Iterables where more than one item can occurr. 
