@@ -2,6 +2,36 @@ import re
 from typing import Union, IO, List
 
 
+class Option:
+    """
+    Represents an Option of an INI-File
+    """
+
+    def __init__(self, key: str, value: str=None, section=None):
+        self.key: str = key
+        self.value: str = value
+        self.section = section
+
+
+class Section:
+    """
+    Represents a Section conatining Options of an INI-File
+    """
+
+    def __init__(self, name: str=None):
+        self.name: str = name
+        self.options: List[Option] = []
+
+    def get(self, option_name: str) -> List[Option]:
+        return [option for option in self.options if option_name == option.key]
+
+    def __getitem__(self, key: str):
+        options = self.get(key)
+        if len(options) == 0:
+            raise KeyError(key)
+        return [option.value for option in options]
+
+
 class MultiIniParser:
     """
     Ini-File configuration parser that is able to read config files containing multiple sections and options with the
@@ -103,32 +133,3 @@ class MultiIniParser:
         if len(sections) == 0:
             raise KeyError(key)
         return sections
-
-class Option:
-    """
-    Represents an Option of an INI-File
-    """
-
-    def __init__(self, key: str, value: str=None, section=None):
-        self.key: str = key
-        self.value: str = value
-        self.section = section
-
-
-class Section:
-    """
-    Represents a Section containing Options of an INI-File
-    """
-
-    def __init__(self, name: str=None):
-        self.name: str = name
-        self.options: List[Option] = []
-
-    def get(self, option_name: str) -> List[Option]:
-        return [option for option in self.options if option_name == option.key]
-
-    def __getitem__(self, key: str):
-        options = self.get(key)
-        if len(options) == 0:
-            raise KeyError(key)
-        return [option.value for option in options]
