@@ -1,5 +1,5 @@
 import re
-from typing import Union, IO, List
+from typing import Union, IO, List, Iterable
 
 
 class Option:
@@ -22,7 +22,7 @@ class Section:
         self.name: str = name
         self.options: List[Option] = []
 
-    def get(self, option_name: str) -> List[Option]:
+    def get(self, option_name: str) -> Iterable[Option]:
         return [option for option in self.options if option_name == option.key]
 
     def __getitem__(self, key: str):
@@ -88,7 +88,10 @@ class MultiIniParser:
         option_template_with_delimiters = MultiIniParser._OPTION_TEMPLATE.format(delim=prepared_delimiters) # idea taken from Python configparser module
         self.option_regex = re.compile(option_template_with_delimiters, re.VERBOSE) # idea taken from Python configparser module
 
-    def get(self, section_name: Union[str, None], option_name: str) -> List[Option]:
+    def get_sections_by_name(self, section_name) -> Iterable[Section]:
+        return [section for section in self.sections if section_name == section.name]
+
+    def get(self, section_name: Union[str, None], option_name: str) -> Iterable[Option]:
         if section_name is None:
             section = self._top_section
             return section.get(option_name)
@@ -99,10 +102,7 @@ class MultiIniParser:
                     found_options.extend(section.get(option_name))
             return found_options
 
-    def get_sections_by_name(self, section_name) -> List[Section]:
-        return [section for section in self.sections if section_name == section.name]
-
-    def read(self, to_parse: Union[str, IO, List[str]]):
+    def read(self, to_parse: Union[str, IO, Iterable[str]]):
         lines: List[str] = []
         if isinstance(to_parse, IO):
             lines = to_parse.readlines()
@@ -131,10 +131,10 @@ class MultiIniParser:
                 actual_section.options.append(Option(key=option, value=value,
                                                      section=actual_section))
 
-    def __getitem__(self, key: Union[str, None]) -> Union[Section, List[Section]]:
+    def __getitem__(self, key: Union[str, None]) -> Union[Section, Iterable[Section]]:
         if key is None:
             return self._top_section
-        sections = self.get_sections_by_name(key)
+        sections: Iterable = self.get_sections_by_name(key)
         if len(sections) == 0:
             raise KeyError(key)
         return sections
