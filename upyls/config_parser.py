@@ -23,7 +23,7 @@ class Section:
         options = self.get(key)
         if len(options) == 0:
             raise KeyError(key)
-        return options
+        return [option.value for option in options]
 
 
 class MultiIniParser:

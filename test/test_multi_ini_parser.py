@@ -13,9 +13,9 @@ option3: third option
 """
         parser = MultiIniParser()
         parser.read(ini_config)
-        self.assertEqual("first option", parser[None][0]["option1"][0].value)
-        self.assertEqual("second option", parser["section1"][0]["option2"][0].value)
-        self.assertEqual("third option", parser["section2"][0]["option3"][0].value)
+        self.assertEqual("first option", parser[None][0]["option1"][0])
+        self.assertEqual("second option", parser["section1"][0]["option2"][0])
+        self.assertEqual("third option", parser["section2"][0]["option3"][0])
 
     def test_simple_ini_config_equals_delimiter(self):
         ini_config = """option1= first option
@@ -26,9 +26,9 @@ option3= third option
 """
         parser = MultiIniParser()
         parser.read(ini_config)
-        self.assertEqual("first option", parser[None][0]["option1"][0].value)
-        self.assertEqual("second option", parser["section1"][0]["option2"][0].value)
-        self.assertEqual("third option", parser["section2"][0]["option3"][0].value)
+        self.assertEqual("first option", parser[None][0]["option1"][0])
+        self.assertEqual("second option", parser["section1"][0]["option2"][0])
+        self.assertEqual("third option", parser["section2"][0]["option3"][0])
 
     def test_ini_config_multiple_section_name_colon_delimiter(self):
         ini_config = """option1: first option
@@ -39,9 +39,9 @@ option3: third option
 """
         parser = MultiIniParser()
         parser.read(ini_config)
-        self.assertEqual("first option", parser[None][0]["option1"][0].value)
-        self.assertEqual("second option", parser["section"][0]["option2"][0].value)
-        self.assertEqual("third option", parser["section"][1]["option3"][0].value)
+        self.assertEqual("first option", parser[None][0]["option1"][0])
+        self.assertEqual("second option", parser["section"][0]["option2"][0])
+        self.assertEqual("third option", parser["section"][1]["option3"][0])
 
     def test_ini_config_multiple_option_name_colon_delimiter(self):
         ini_config = """option1: first option
@@ -54,11 +54,11 @@ option3: second third option
 """
         parser = MultiIniParser()
         parser.read(ini_config)
-        self.assertEqual("first option", parser[None][0]["option1"][0].value)
-        self.assertEqual("second option", parser["section"][0]["option2"][0].value)
-        self.assertEqual("second second option", parser["section"][0]["option2"][1].value)
-        self.assertEqual("third option", parser["section"][1]["option3"][0].value)
-        self.assertEqual("second third option", parser["section"][1]["option3"][1].value)
+        self.assertEqual("first option", parser[None][0]["option1"][0])
+        self.assertEqual("second option", parser["section"][0]["option2"][0])
+        self.assertEqual("second second option", parser["section"][0]["option2"][1])
+        self.assertEqual("third option", parser["section"][1]["option3"][0])
+        self.assertEqual("second third option", parser["section"][1]["option3"][1])
 
 
 
