@@ -88,25 +88,6 @@ class MultiIniParser:
         option_template_with_delimiters = MultiIniParser._OPTION_TEMPLATE.format(delim=prepared_delimiters) # idea taken from Python configparser module
         self.option_regex = re.compile(option_template_with_delimiters, re.VERBOSE) # idea taken from Python configparser module
 
-    def get_sections_by_name(self, section_name) -> Iterable[Section]:
-        """
-        retrieve a collection of :Section:, which bear the passed name
-        :param section_name: the name of the sections to be retrieved
-        :return: a collection of :Section:s
-        """
-        return [section for section in self.sections if section_name == section.name]
-
-    def get(self, section_name: Union[str, None], option_name: str) -> Iterable[Option]:
-        if section_name is None:
-            section = self._top_section
-            return section.get(option_name)
-        else:
-            found_options: List[Option] = list()
-            sections_by_name = self.get_sections_by_name(section_name)
-            for section in sections_by_name:
-                    found_options.extend(section.get(option_name))
-            return found_options
-
     def read(self, to_parse: Union[str, IO, Iterable[str]]):
         """
         read the ini-file from either a :str:, a file or a collection of :str: lines and parse them into items of
@@ -144,6 +125,25 @@ class MultiIniParser:
                 value = option_match.group("value")
                 actual_section.options.append(Option(key=option, value=value,
                                                      section=actual_section))
+
+    def get_sections_by_name(self, section_name) -> Iterable[Section]:
+        """
+        retrieve a collection of :Section:, which bear the passed name
+        :param section_name: the name of the sections to be retrieved
+        :return: a collection of :Section:s
+        """
+        return [section for section in self.sections if section_name == section.name]
+
+    def get(self, section_name: Union[str, None], option_name: str) -> Iterable[Option]:
+        if section_name is None:
+            section = self._top_section
+            return section.get(option_name)
+        else:
+            found_options: List[Option] = list()
+            sections_by_name = self.get_sections_by_name(section_name)
+            for section in sections_by_name:
+                    found_options.extend(section.get(option_name))
+            return found_options
 
     def __getitem__(self, key: Union[str, None]) -> Union[Section, Iterable[Section]]:
         if key is None:
