@@ -8,6 +8,12 @@ class Option:
     """
 
     def __init__(self, key: str, value: str=None, section=None):
+        """
+        create an :Option:
+        :param key: the :Option:'s key
+        :param value: the :Option:'s value
+        :param section: the :Section: the :Option: will be assiciated with
+        """
         self.key: str = key
         self.value: str = value
         self.section = section
