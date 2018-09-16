@@ -108,6 +108,12 @@ class MultiIniParser:
             return found_options
 
     def read(self, to_parse: Union[str, IO, Iterable[str]]):
+        """
+        read the ini-file from either a :str:, a file or a collection of :str: lines and parse them into items of
+        :Section:s and :Option:s
+        :param to_parse: a single string containing the whole INI-File, a file on a filesystem or a collection of :str:
+        lines which contain the INI-File.
+        """
         lines: List[str] = []
         if isinstance(to_parse, IO):
             lines = to_parse.readlines()
@@ -121,14 +127,17 @@ class MultiIniParser:
         for line in lines:
             line_without_comments = line.split("#", 1)[0]
             empty_line_regex = re.compile("^\s*$")
+
             if re.match(empty_line_regex, line):
                 continue
+
             section_match = re.match(MultiIniParser._SECTION_COMPILED_REGEX, line_without_comments)
             if section_match:
                 section_name = section_match.group("header")
                 section = Section(name=section_name)
                 self.sections.append(section)
                 actual_section = section
+
             option_match = re.match(self.option_regex, line_without_comments)
             if option_match:
                 option = option_match.group("option")
