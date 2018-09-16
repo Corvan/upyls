@@ -135,6 +135,13 @@ class MultiIniParser:
         return [section for section in self.sections if section_name == section.name]
 
     def get(self, section_name: Union[str, None], option_name: str) -> Iterable[Option]:
+        """
+        get all options for passed section and option names
+        :param section_name: the :Section:'s name the :Option:s are associated with, can be :None: if you want the
+        :Options: in the top level section without a name
+        :param option_name: the :Option:s' name
+        :return: a collection of the requested :Option:s
+        """
         if section_name is None:
             section = self._top_section
             return section.get(option_name)
