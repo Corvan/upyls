@@ -32,27 +32,29 @@ class MultiIniParser:
     same name
     """
 
-    _SECT_TMPL = r"""
+    _SECTION_TEMPLATE = r"""
             \[                                  # [
             (?P<header>[^]]+)                   # very permissive!
             \]                                  # ]
             """
-    _OPT_TMPL = r"""
-            (?P<option>.*?)                     # very permissive!
-            \s*(?:                              # any number of space/tab,
-            (?P<vi>{delim})\s*                  # optionally followed by
-                                                # any of the allowed
-                                                # delimiters, followed by any
-                                                # space/tab
-            (?P<value>.*))?$
-            """
-    SECTCRE = re.compile(_SECT_TMPL, re.VERBOSE)
+    _OPTION_TEMPLATE = r"""
+                (?P<option>.*?)                     # very permissive!
+                \s*(?:                              # any number of space/tab,
+                (?P<vi>{delim})\s*                  # optionally followed by
+                                                    # any of the allowed
+                                                    # delimiters, followed by any
+                                                    # space/tab
+                (?P<value>.*))?$
+                """
+    SECTCRE = re.compile(_SECTION_TEMPLATE, re.VERBOSE)
 
     def __init__(self, delimiters=(':', '=')):
         self._top_section: Section = Section()
         self.sections: List[Section] = []
-        self.option_delimiter = ":"
-        self.option_regex = re.compile(MultiIniParser._OPT_TMPL.format(delim=delimiters))
+        escaped_delimiters = [re.escape(d) for d in delimiters]
+        prepared_delimiters = "|".join(escaped_delimiters)
+        option_template_with_delimiters = MultiIniParser._OPTION_TEMPLATE.format(delim=prepared_delimiters)
+        self.option_regex = re.compile(option_template_with_delimiters, re.VERBOSE)
 
     def get(self, section_name: Union[str, None], option_name: str) -> List[Option]:
         if section_name is None:
@@ -74,7 +76,7 @@ class MultiIniParser:
             lines = to_parse.readlines()
         elif isinstance(to_parse, str):
             lines = to_parse.splitlines()
-        elif isinstance(to_parse, List[str]):
+        elif isinstance(to_parse, list):
             lines = to_parse
         else:
             raise ValueError("to_parse must either be a str, a file or a list of strings")
