@@ -82,3 +82,6 @@ turn them to an own class, while it is not impropable that it somewhen will beco
 `configparser.ConfigParser`. It is not meant to steal but meant to extend the functionality in a way that keeps the 
 ideas and interfaces. But in some things it behaves a bit different due to the fact of multiple items. So it often 
 returns Iterables where more than one item can occurr. 
+
+This is still work in Progress and it does not yet implement all the possibilities of `configparser.ConfigParser` 
+but basically it is working.
