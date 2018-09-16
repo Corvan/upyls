@@ -131,6 +131,7 @@ class MultiIniParser:
                 section = Section(name=section_name)
                 self.sections.append(section)
                 actual_section = section
+                continue
 
             option_match = re.match(self.option_regex, line_without_comments)
             if option_match:
