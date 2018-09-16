@@ -1,6 +1,6 @@
 import unittest
 
-from upyls.config_parser import MultiIniParser
+from upyls import MultiIniParser
 
 
 class TestMultiIniParser(unittest.TestCase):
