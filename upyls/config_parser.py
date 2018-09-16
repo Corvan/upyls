@@ -76,6 +76,11 @@ class MultiIniParser:
     _SECTION_COMPILED_REGEX = re.compile(_SECTION_TEMPLATE, re.VERBOSE)
 
     def __init__(self, option_delimiters=(':', '=')):
+        """
+        create a :class MultiINIParser:
+        :param option_delimiters: define the characters which delimit option name and option value,
+        defaults are ':' and '='
+        """
         self._top_section: Section = Section()
         self.sections: List[Section] = []
         escaped_delimiters = [re.escape(d) for d in option_delimiters] # idea taken from Python configparser module
