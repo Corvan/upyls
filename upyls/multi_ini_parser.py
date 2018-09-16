@@ -182,8 +182,8 @@ class MultiIniParser:
             return section.get(option_name)
         else:
             found_options: List[Option] = list()
-            sections_by_name = self.get_sections_by_name(section_name)
-            for section in sections_by_name:
+            for section in self.get_sections_by_name(section_name):
+                if section.get(option_name) is not None:
                     found_options.extend(section.get(option_name))
             return found_options
 
