@@ -61,6 +61,23 @@ option3: second third option
         self.assertEqual("second third option", parser["section"][1]["option3"][1])
 
 
+    def test_ini_config_get_options_by_name(self):
+        ini_config = """option1: first option
+[section]
+option2: second option
+option2: second second option
+[section]
+option3: third option
+option3: second third option
+"""
+        parser = MultiIniParser()
+        parser.read(ini_config)
+        options2 = parser.get_options_by_name("option2")
+        self.assertEqual("second option", options2[0].value)
+        self.assertEqual("second second option", options2[1].value)
+        options3 = parser.get_options_by_name("option3")
+        self.assertEqual("third option", options3[0].value)
+        self.assertEqual("second third option", options3[1].value)
 
 
 

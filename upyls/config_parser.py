@@ -170,6 +170,17 @@ class MultiIniParser:
                     found_options.extend(section.get(option_name))
             return found_options
 
+    def get_options_by_name(self, option_name: str) -> Union[Iterable[Option], None]:
+        """
+        get all :Option:s from all section in INI-File which bear the passed name
+        :param option_name: the :Option:s' name
+        :return: a collection of :Option:s or None if no :Option: with that name can be found
+        """
+        options: Option = list()
+        for section in self.sections:
+            options.extend([option for option in section.options if option.key == option_name])
+        return options if len(options) != 0 else None
+
     def __getitem__(self, key: Union[str, None]) -> Union[Section, Iterable[Section]]:
         """
         get the :Section:s of an INI-File with a given key but with Python's square bracket notation::
