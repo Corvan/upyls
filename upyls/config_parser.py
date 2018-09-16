@@ -36,6 +36,7 @@ class MultiIniParser:
             \[                                  # [
             (?P<header>[^]]+)                   # very permissive!
             \]                                  # ]
+                                                # source: Python configparser module
             """
     _OPTION_TEMPLATE = r"""
                 (?P<option>.*?)                     # very permissive!
@@ -44,6 +45,7 @@ class MultiIniParser:
                                                     # any of the allowed
                                                     # delimiters, followed by any
                                                     # space/tab
+                                                    # source: Python configparser module
                 (?P<value>.*))?$
                 """
     SECTCRE = re.compile(_SECTION_TEMPLATE, re.VERBOSE)
@@ -51,10 +53,10 @@ class MultiIniParser:
     def __init__(self, delimiters=(':', '=')):
         self._top_section: Section = Section()
         self.sections: List[Section] = []
-        escaped_delimiters = [re.escape(d) for d in delimiters]
-        prepared_delimiters = "|".join(escaped_delimiters)
-        option_template_with_delimiters = MultiIniParser._OPTION_TEMPLATE.format(delim=prepared_delimiters)
-        self.option_regex = re.compile(option_template_with_delimiters, re.VERBOSE)
+        escaped_delimiters = [re.escape(d) for d in delimiters] # idea taken from Python configparser module
+        prepared_delimiters = "|".join(escaped_delimiters) # idea taken from Python configparser module
+        option_template_with_delimiters = MultiIniParser._OPTION_TEMPLATE.format(delim=prepared_delimiters) # idea taken from Python configparser module
+        self.option_regex = re.compile(option_template_with_delimiters, re.VERBOSE) # idea taken from Python configparser module
 
     def get(self, section_name: Union[str, None], option_name: str) -> List[Option]:
         if section_name is None:
