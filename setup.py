@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name='upyls',
-    version='0.0.3',
+    version='0.0.4',
     url='https://github.com/Corvan/upyls',
     license='LGPL v. 2.1',
     author='Lars Liedtke',
