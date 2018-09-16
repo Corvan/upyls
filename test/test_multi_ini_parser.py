@@ -80,7 +80,7 @@ option3: second third option
         self.assertEqual("third option", sections[1].options[0].value)
         self.assertEqual("second third option", sections[1].options[1].value)
 
-    def test_get_options_by_name(self):
+    def test_get_options_by_name_options_in_different_sections(self):
         ini_config = """option1: first option
 [section]
 option2: second option
@@ -98,7 +98,23 @@ option3: second third option
         self.assertEqual("third option", options3[0].value)
         self.assertEqual("second third option", options3[1].value)
 
-
+    def test_get_options_by_name_options_in_same_sections(self):
+        ini_config = """option1: first option
+[section]
+option2: second option
+option3: third option
+[section]
+option2: second second option
+option3: second third option
+"""
+        parser = MultiIniParser()
+        parser.read(ini_config)
+        options2 = parser.get_options_by_name("option2")
+        self.assertEqual("second option", options2[0].value)
+        self.assertEqual("second second option", options2[1].value)
+        options3 = parser.get_options_by_name("option3")
+        self.assertEqual("third option", options3[0].value)
+        self.assertEqual("second third option", options3[1].value)
 
 if __name__ == '__main__':
     unittest.main()
