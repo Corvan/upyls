@@ -3,6 +3,9 @@ from typing import Union, IO, List
 
 
 class Option:
+    """
+    Represents an Option of an INI-File
+    """
 
     def __init__(self, key: str, value: str=None, section=None):
         self.key: str = key
@@ -11,6 +14,9 @@ class Option:
 
 
 class Section:
+    """
+    Represents a Section conatining Options of an INI-File
+    """
 
     def __init__(self, name: str=None):
         self.name: str = name
