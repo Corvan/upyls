@@ -55,6 +55,19 @@ class MultiIniParser:
         option2_2 = parser["section"][0]["option2"[1]
         option3_1 = parser["section"][1]["option3"[0]
         option3_2 = parser["section"][1]["option3"[1]
+    or with::
+        parser = MultiIniParser()
+        parser.read(ini_file)
+        top_level_section = parser.get_sections_by_name(None)
+        option1 = top_level_section.get("option1")
+        option1_value = option1.value
+        sections = parser.get_sections_by_name("section")
+        option2 = sections[0].get("option2")
+        option21_value = option2[0].value
+        option22_value = option2[1].value
+        option3 = sections[1].get("option2")
+        option31_value = option3[0].value
+        option32_value = option3[1].value
     """
 
     _SECTION_TEMPLATE = r"""
@@ -153,6 +166,7 @@ class MultiIniParser:
             return found_options
 
     def __getitem__(self, key: Union[str, None]) -> Union[Section, Iterable[Section]]:
+
         if key is None:
             return self._top_section
         sections: Iterable = self.get_sections_by_name(key)
