@@ -13,7 +13,7 @@ option3: third option
 """
         parser = MultiIniParser()
         parser.read(ini_config)
-        self.assertEqual("first option", parser[None][0]["option1"][0])
+        self.assertEqual("first option", parser[None]["option1"][0])
         self.assertEqual("second option", parser["section1"][0]["option2"][0])
         self.assertEqual("third option", parser["section2"][0]["option3"][0])
 
@@ -26,7 +26,7 @@ option3= third option
 """
         parser = MultiIniParser()
         parser.read(ini_config)
-        self.assertEqual("first option", parser[None][0]["option1"][0])
+        self.assertEqual("first option", parser[None]["option1"][0])
         self.assertEqual("second option", parser["section1"][0]["option2"][0])
         self.assertEqual("third option", parser["section2"][0]["option3"][0])
 
@@ -39,7 +39,7 @@ option3: third option
 """
         parser = MultiIniParser()
         parser.read(ini_config)
-        self.assertEqual("first option", parser[None][0]["option1"][0])
+        self.assertEqual("first option", parser[None]["option1"][0])
         self.assertEqual("second option", parser["section"][0]["option2"][0])
         self.assertEqual("third option", parser["section"][1]["option3"][0])
 
@@ -54,7 +54,7 @@ option3: second third option
 """
         parser = MultiIniParser()
         parser.read(ini_config)
-        self.assertEqual("first option", parser[None][0]["option1"][0])
+        self.assertEqual("first option", parser[None]["option1"][0])
         self.assertEqual("second option", parser["section"][0]["option2"][0])
         self.assertEqual("second second option", parser["section"][0]["option2"][1])
         self.assertEqual("third option", parser["section"][1]["option3"][0])

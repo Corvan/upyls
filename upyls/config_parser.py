@@ -50,7 +50,7 @@ class MultiIniParser:
     can be accessed with::
         parser = MultiIniParser()
         parser.read(ini_file)
-        option1 = parser[None][0]["option1"][0]
+        option1 = parser[None]["option1"][0]
         option2_1 = parser["section"][0]["option2"[0]
         option2_2 = parser["section"][0]["option2"[1]
         option3_1 = parser["section"][1]["option3"[0]
@@ -126,9 +126,9 @@ class MultiIniParser:
                 actual_section.options.append(Option(key=option, value=value,
                                                      section=actual_section))
 
-    def __getitem__(self, key: Union[str, None]) -> List[Section]:
+    def __getitem__(self, key: Union[str, None]) -> Union[Section, List[Section]]:
         if key is None:
-            return [self._top_section]
+            return self._top_section
         sections = self.get_sections_by_name(key)
         if len(sections) == 0:
             raise KeyError(key)
