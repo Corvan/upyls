@@ -75,10 +75,10 @@ class MultiIniParser:
                 """
     SECTCRE = re.compile(_SECTION_TEMPLATE, re.VERBOSE)
 
-    def __init__(self, delimiters=(':', '=')):
+    def __init__(self, option_delimiters=(':', '=')):
         self._top_section: Section = Section()
         self.sections: List[Section] = []
-        escaped_delimiters = [re.escape(d) for d in delimiters] # idea taken from Python configparser module
+        escaped_delimiters = [re.escape(d) for d in option_delimiters] # idea taken from Python configparser module
         prepared_delimiters = "|".join(escaped_delimiters) # idea taken from Python configparser module
         option_template_with_delimiters = MultiIniParser._OPTION_TEMPLATE.format(delim=prepared_delimiters) # idea taken from Python configparser module
         self.option_regex = re.compile(option_template_with_delimiters, re.VERBOSE) # idea taken from Python configparser module
