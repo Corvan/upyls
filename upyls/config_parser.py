@@ -33,7 +33,13 @@ class Section:
         self.options: List[Option] = []
 
     def get(self, option_name: str) -> Iterable[Option]:
-        return [option for option in self.options if option_name == option.key]
+        """
+        get all :Option:s with a certain name if they are contained in this :Section:
+        :param option_name: the :Option:'s name
+        :return: a collection of :Option;s or None if no :Option: with this name is contained in this :Section:
+        """
+        options = [option for option in self.options if option_name == option.key]
+        return options if len(options) != 0 else None
 
     def __getitem__(self, key: str):
         options = self.get(key)
