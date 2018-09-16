@@ -32,7 +32,7 @@ class Section:
         self.name: str = name
         self.options: List[Option] = []
 
-    def get(self, option_name: str) -> Iterable[Option]:
+    def get(self, option_name: str) -> List[Option]:
         """
         get all :Option:s with a certain name if they are contained in this :Section:
         :param option_name: the :Option:'s name
@@ -117,7 +117,7 @@ class MultiIniParser:
         option_template_with_delimiters = MultiIniParser._OPTION_TEMPLATE.format(delim=prepared_delimiters) # idea taken from Python configparser module
         self.option_regex = re.compile(option_template_with_delimiters, re.VERBOSE) # idea taken from Python configparser module
 
-    def read(self, to_parse: Union[str, IO, Iterable[str]]):
+    def read(self, to_parse: Union[str, IO, List[str]]):
         """
         read the ini-file from either a :str:, a file or a collection of :str: lines and parse them into items of
         :Section:s and :Option:s
@@ -156,7 +156,7 @@ class MultiIniParser:
                 actual_section.options.append(Option(key=option, value=value,
                                                      section=actual_section))
 
-    def get_sections_by_name(self, section_name) -> Union[Section, Iterable[Section], None]:
+    def get_sections_by_name(self, section_name) -> Union[Section, List[Section], None]:
         """
         retrieve a collection of :Section:, which bear the passed name
         :param section_name: the name of the sections to be retrieved, if :None: is passed the top level section without
@@ -169,7 +169,7 @@ class MultiIniParser:
         sections = [section for section in self.sections if section_name == section.name]
         return sections if len(sections) != 0 else None
 
-    def get(self, section_name: Union[str, None], option_name: str) -> Iterable[Option]:
+    def get(self, section_name: Union[str, None], option_name: str) -> List[Option]:
         """
         get all options for passed section and option names
         :param section_name: the :Section:'s name the :Option:s are associated with, can be :None: if you want the
@@ -187,7 +187,7 @@ class MultiIniParser:
                     found_options.extend(section.get(option_name))
             return found_options
 
-    def get_options_by_name(self, option_name: str) -> Union[Iterable[Option], None]:
+    def get_options_by_name(self, option_name: str) -> Union[List[Option], None]:
         """
         get all :Option:s from all section in INI-File which bear the passed name
         :param option_name: the :Option:s' name
@@ -198,7 +198,7 @@ class MultiIniParser:
             options.extend([option for option in section.options if option.key == option_name])
         return options if len(options) != 0 else None
 
-    def __getitem__(self, key: Union[str, None]) -> Union[Section, Iterable[Section]]:
+    def __getitem__(self, key: Union[str, None]) -> Union[Section, List[Section]]:
         """
         get the :Section:s of an INI-File with a given key but with Python's square bracket notation::
         sections = parser["section"]
