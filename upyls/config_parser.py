@@ -169,7 +169,13 @@ class MultiIniParser:
             return found_options
 
     def __getitem__(self, key: Union[str, None]) -> Union[Section, Iterable[Section]]:
-
+        """
+        get the :Section:s of an INI-File with a given key but with Python's square bracket notation::
+        sections = parser["section"]
+        :param key: the :Section:s' name, can be :None: if you want the top level :Section: without a name
+        :return: either the top level section if None is passed, or a collection of :Section:s with the respective name
+        :raise KeyError: if there are no sections with that name
+        """
         if key is None:
             return self._top_section
         sections: Iterable = self.get_sections_by_name(key)
