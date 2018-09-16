@@ -19,6 +19,12 @@ class Section:
     def get(self, option_name: str) -> List[Option]:
         return [option for option in self.options if option_name == option.key]
 
+    def __getitem__(self, key: str):
+        options = self.get(key)
+        if len(options) == 0:
+            raise KeyError(key)
+        return options
+
 
 class MultiIniParser:
     """
@@ -90,3 +96,10 @@ class MultiIniParser:
                 value = option_match.group("value")
                 actual_section.options.append(Option(key=option, value=value,
                                                      section=actual_section))
+    def __getitem__(self, key: Union[str, None]) -> List[Section]:
+        if key is None:
+            return [self._top_section]
+        sections = self.get_sections_by_name(key)
+        if len(sections) == 0:
+            raise KeyError(key)
+        return sections
