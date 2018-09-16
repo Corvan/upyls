@@ -73,7 +73,7 @@ class MultiIniParser:
                                                     # source: Python configparser module
                 (?P<value>.*))?$
                 """
-    SECTCRE = re.compile(_SECTION_TEMPLATE, re.VERBOSE)
+    _SECTION_COMPILED_REGEX = re.compile(_SECTION_TEMPLATE, re.VERBOSE)
 
     def __init__(self, option_delimiters=(':', '=')):
         self._top_section: Section = Section()
@@ -113,7 +113,7 @@ class MultiIniParser:
             empty_line_regex = re.compile("^\s*$")
             if re.match(empty_line_regex, line):
                 continue
-            section_match = re.match(MultiIniParser.SECTCRE, line_without_comments)
+            section_match = re.match(MultiIniParser._SECTION_COMPILED_REGEX, line_without_comments)
             if section_match:
                 section_name = section_match.group("header")
                 section = Section(name=section_name)
