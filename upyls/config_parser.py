@@ -15,7 +15,7 @@ class Option:
 
 class Section:
     """
-    Represents a Section conatining Options of an INI-File
+    Represents a Section containing Options of an INI-File
     """
 
     def __init__(self, name: str=None):
@@ -35,7 +35,7 @@ class Section:
 class MultiIniParser:
     """
     Ini-File configuration parser that is able to read config files containing multiple sections and options with the
-    same name. This class takes the ideas and some code of :class configparser.ConfigParser: from the Python Standard-library and
+    same name. This class takes the ideas and some code of :configparser.ConfigParser: from the Python Standard-library and
     extends those to its cause. Additionally it strives for an easier readablity as the original.
 
     Example INI-File::
@@ -77,7 +77,7 @@ class MultiIniParser:
 
     def __init__(self, option_delimiters=(':', '=')):
         """
-        create a :class MultiINIParser:
+        create a :MultiIniParser:
         :param option_delimiters: define the characters which delimit option name and option value,
         defaults are ':' and '='
         """
@@ -89,6 +89,11 @@ class MultiIniParser:
         self.option_regex = re.compile(option_template_with_delimiters, re.VERBOSE) # idea taken from Python configparser module
 
     def get_sections_by_name(self, section_name) -> Iterable[Section]:
+        """
+        retrieve a collection of :Section:, which bear the passed name
+        :param section_name: the name of the sections to be retrieved
+        :return: a collection of :Section:s
+        """
         return [section for section in self.sections if section_name == section.name]
 
     def get(self, section_name: Union[str, None], option_name: str) -> Iterable[Option]:
