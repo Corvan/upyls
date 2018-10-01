@@ -209,6 +209,8 @@ class MultiIniParser:
         if key is None:
             return self._top_section
         sections: Iterable = self.get_sections_by_name(key)
+        if sections is None:
+            raise KeyError(f"There are no sections presentwith the name '{key}'")
         if len(sections) == 0:
             raise KeyError(key)
         return sections
