@@ -104,17 +104,20 @@ class LimitedList(UserList, Generic[T]):
                 raise ValueError("Lower limit cannot be negative")
             if initlist is not None:
                 if len(initlist) < lower_limit:
-                    raise OverflowError("Size of Initializer is smaller than lower limit")
+                    raise OverflowError(f"Size of Initializer is smaller than lower limit, "
+                                        f"size of initializer: {len(initlist)} | lower limit: {lower_limit}")
         if upper_limit is not None and upper_limit != 0:
             if upper_limit < 0:
                 raise ValueError("Upper limit cannot be negative")
             if initlist is not None:
                 if len(initlist) > upper_limit:
-                    raise OverflowError("Size of Initializer is greater than upper limit")
+                    raise OverflowError(f"Size of Initializer is greater than upper limit, "
+                                        f"size of initializer: {len(initlist)} | upper limit: {upper_limit}")
         if upper_limit is not None and lower_limit is not None:
             if upper_limit != 0 and lower_limit != 0:
                 if upper_limit < lower_limit:
-                    raise ValueError("Upper limit can not be smaller than lower limit")
+                    raise ValueError(f"Upper limit can not be smaller than lower limit, "
+                                     f"upper limit: {upper_limit} | lower limit: {lower_limit}")
 
     def __check_add_limit(self):
         if self._upper_limit is not None and self._upper_limit != 0:
