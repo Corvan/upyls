@@ -1,12 +1,11 @@
-
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(
     name='upyls',
-    version='0.0.4',
+    version='0.1.0',
     url='https://github.com/Corvan/upyls',
     license='LGPL v. 2.1',
     author='Lars Liedtke',
