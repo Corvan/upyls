@@ -1,5 +1,5 @@
 import re
-from typing import Union, IO, List, Iterable
+from typing import IO, Iterable, List, Union
 
 
 class Option:
@@ -182,10 +182,11 @@ class MultiIniParser:
             return section.get(option_name)
         else:
             found_options: List[Option] = list()
-            for section in self.get_sections_by_name(section_name):
-                if section.get(option_name) is not None:
-                    found_options.extend(section.get(option_name))
-            return found_options
+            if self.get_sections_by_name(section_name):
+                for section in self.get_sections_by_name(section_name):
+                    if section.get(option_name):
+                        found_options.extend(section.get(option_name))
+            return found_options if len(found_options) > 0 else None
 
     def get_options_by_name(self, option_name: str) -> Union[List[Option], None]:
         """
